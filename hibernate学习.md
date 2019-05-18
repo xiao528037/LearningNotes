@@ -409,7 +409,7 @@ public class Student {
 
 
 
-![](image\cascade.png)
+![级联设置](assets/cascade.png)
 
 ​		测试
 
@@ -1067,6 +1067,10 @@ SELECT * FROM classess c right JOIN t_student s ON c.cid=s.cid
 ```xml
 <set name="courseSet" table="student_course" cascade="save-update,delete" fetch="select" lazy="false[true|false|extra]">
 ```
+
+
+
+![1558143852658](assets/1558143852658.png)
 
 ### 批量抓取
 
