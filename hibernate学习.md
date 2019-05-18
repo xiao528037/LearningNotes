@@ -743,16 +743,14 @@ public class Course {
 #### 7.聚集函数使用
 
 ```java
-	/**
-     * HQL投影查询
-     */
+	  /**
+     	* HQL聚集函数
+     	*/
     @Test
-    public void testSelect4(){
-        Query from_student_ = session.createQuery("select id,sname from Student");
-        List<Object> list = from_student_.list();
-        for (Object student:list){
-            System.out.println(student.toString());
-        }
+    public void testSelect5() {
+        Query from_student_ = session.createQuery("select count(*) from Student");
+        Object o = from_student_.uniqueResult();
+        System.out.println(o);
     }
 ```
 
