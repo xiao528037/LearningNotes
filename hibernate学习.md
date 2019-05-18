@@ -795,7 +795,7 @@ SELECT * FROM classess c,t_student s WHERE c.cid=s.cid
 ##### 3.左外连接
 
 ```sql
-SELECT * FROM classess c LEFT JOIN t_student s ON c.cid=s.cid
+SELECT * FROM classess c LEFT JOIN t_student s ON c.cid=s.cid  
 ```
 
 ```java
