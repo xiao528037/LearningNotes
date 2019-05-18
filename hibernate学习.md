@@ -1,6 +1,6 @@
-# hibernate学习
+# Hibernate学习
 
-## hibernate基本配置
+## Hibernate基本配置
 
 	### 实体类
 ```java
@@ -26,7 +26,7 @@ public class GoodsEntity {
 }
 ```
 
-### hibernate核心配置文件 hibernate.cfg.xml
+### Hibernate核心配置文件 
 
 ```xml
 <?xml version='1.0' encoding='utf-8'?>
@@ -758,7 +758,7 @@ public class Course {
 
 #### 8.HQL多表查询
 
-	##### 内连接
+##### 1.内连接
 
 ```sql
 SELECT * FROM classess c,t_student s WHERE c.cid=s.cid
@@ -773,14 +773,12 @@ SELECT * FROM classess c,t_student s WHERE c.cid=s.cid
     }
 ```
 
-##### 迫切内连接
+##### 2.迫切内连接
 
 ```txt
 1. 迫切内连接和内连接底层实现是一样的
 2. 区别：使用内连接返回值是一个list集合，迫切内连接返回的是对象
 ```
-
-
 
 ```java
     /**
@@ -796,13 +794,42 @@ SELECT * FROM classess c,t_student s WHERE c.cid=s.cid
 
 
 
-##### 左外连接
+##### 3.左外连接
 
 ```sql
 SELECT * FROM classess c LEFT JOIN t_student s ON c.cid=s.cid
 ```
 
-##### 右外连接
+```java
+ @Test
+    public void testSelect13() {
+        Query query = session.createQuery("from Classess c left join c.stu");
+        List list = query.list();
+
+    }
+```
+
+
+
+##### 4.迫切左外连接
+
+```txt
+迫切左外连接from 实体类 C left join fetch c.字段名
+```
+
+```    java
+   	/**
+   	 * 迫切左外连接
+     */
+    @Test
+    public void testSelect14() {
+        Query query = session.createQuery("from Classess c left join fetch c.stu");
+        List list = query.list();
+
+    }
+```
+
+##### 5.右外连接
 
 ```sql
 SELECT * FROM classess c right JOIN t_student s ON c.cid=s.cid
@@ -810,7 +837,16 @@ SELECT * FROM classess c right JOIN t_student s ON c.cid=s.cid
 
 ##### 
 
-##### 迫切左外连接
+```java
+ @Test
+    public void testSelect13() {
+        Query query = session.createQuery("from Classess c tight join c.stu");
+        List list = query.list();
+
+    }
+```
+
+
 
 ### QBC查询
 
@@ -943,13 +979,124 @@ SELECT * FROM classess c right JOIN t_student s ON c.cid=s.cid
     }
 ```
 
-
-
-![QBC](C:\Users\xiangxin\Desktop\笔记\image\QBC.png)
+![QBC](assets/QBC.png)
 
 ### 本地查询
 
 ​	SQLQuery对象，使用普通SQL实现查询
 
+## Hibernate检索策略
 
+	### Hiberatenate检索分为两类
+
+#### 1.立即查询
+
+```txt
+1.立即查询：根据ID查询，调用get方法，一调用方法就会立即发送SQL语句进行查询。
+```
+
+```java
+/**
+ * 立即查询
+ */
+@Test
+    public void testSelect15(){
+        //会直接发送SQL语句向数据库获取内容
+        Student student = session.get(Student.class, "4028b8816ac842f7016ac84321100001");
+    }
+```
+
+#### 2.延迟查询
+
+
+
+```txt
+2.延迟查询：根据ID查询，还有load方法，调用load方法不会马上发送语句查询数据，只有得到对象里面的值时候才会发送语句查询数据库。
+		<1>类级别延迟：根据id查询返回实体类对象，调用load方法不会马上发送SQL语句
+		<2>关联级别延迟：查询班级，通过班级查询班级学生，查询班级学生的过程是否需要延迟，这个过程称为关联级别延迟。
+```
+
+
+
+```java
+
+/**
+ * 延迟查询
+ */
+@Test
+    public void testSelect15(){
+       Student student = session.load(Student.class, "4028b8816ac842f7016ac84321100001");
+        //load返回的是ID，获取ID时，不会发送SQL语句
+       System.out.println(student.getId());
+        //调用除ID外其他属性，会发送SQL语句
+       System.out.println(student.getName());
+    }
+
+```
+
+```java
+ 	/**
+     * hibernate 级联延迟,默认设置
+     */
+    @Test
+    public void testSelect16(){
+        //通过get获取对象，发送SQL语句
+        StudentTwo studentTwo = session.get(StudentTwo.class, 1);
+        //不会发送SQL语句
+        Set<Course> courseSet = studentTwo.getCourseSet();
+        //获取值发送SQL语句
+        System.out.println(courseSet.size());
+    }
+```
+
+
+
+#### 3.关联级别延迟操作
+
+```txt
+1.在映射文件中进行配置实现
+	<1>根据班级获得班级学生，在班级映射文件中高配置
+2.在set标签上使用属性 lazy
+	<1>fetch:值 select
+	<2>lazy:值：
+		-true 延迟
+		-false 不延迟
+		-extra 及其延迟
+```
+
+```xml
+<set name="courseSet" table="student_course" cascade="save-update,delete" fetch="select" lazy="false[true|false|extra]">
+```
+
+### 批量抓取
+
+```txt
+场景：查询所有班级，得到CLASSESS的集合，获得所有班级，遍历班级获得所有学生的信息。
+```
+
+```java
+	/**
+     * 未优化
+     */
+
+    @Test
+    public void testSelect17(){
+        Query from_classess = session.createQuery("from Classess");
+        List<Classess> list = from_classess.list();
+        for (Classess classess:list
+             ) {
+           System.out.println(classess.getId()+"::"+classess.getName());
+            Set<Student> stu = classess.getStu();
+            for (Student stud:stu
+                 ) {
+                System.out.println(stud.getId()+"::"+stud.getSname());
+            }
+        }
+    }
+```
+
+```xml
+batch-size值越大，优化越好。
+<set name="courseSet" table="student_course" cascade="save-update,delete" batch-size="2">
+```
 
