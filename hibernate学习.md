@@ -107,7 +107,6 @@ public class TestGoods {
     private Session session;
     private Transaction transaction;
 
-
     /**
      * 执行test之前执行的代码
      */
