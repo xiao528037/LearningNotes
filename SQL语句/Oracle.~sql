@@ -407,8 +407,8 @@ is
        s number(10);
        c emp.comm%type;
 begin
-  select sal*12,nvl(comm,0) into s,c from emp where empno = eno;
-  yearsal := s+c;
+  select sql*12,nvl(comm,0) into s,c form emp where empno = eno;
+  yearsql := s+c;
 end;
 
 -- 测试p_yearsal
@@ -453,54 +453,3 @@ from emp e;
 -- 只要满足该规则，自动触发，无需调用。
 -- 语句即触发器：不好包含for each row的就是行级触发器
 -- 航迹触发器：包含for each row的就是行级触发器
--- 加for each row是为了使用：old或者：new对象或者一行记录。
-
--- 语句级触发器
--- 插入一条记录，输出一个新员工入职
-create or replace trigger t1
-after
-insert 
-on person
-declare
-
-begin
-  dbms_output.put_line('一个新员工入职');
-end;
--- 触发触发器
-insert into person values(1,'小红');
-commit;
-select * from person;
-
--- 行级别触发器
--- 不能给员工降薪
--- raise_applicaiotn_error(-20001-20999之间,'不能给员工降薪');
-create or replace trigger t2
-before 
-update
-on emp
-for each row
-  declare
-  begin
-    if :old.sal>:new.sal then
-      raise_application_error(-20001,'不能给员工降薪');
-     end if;
-   end;
-   
- -- 触发t2
- update emp set sal =sal-1 where empno =7788;
- commit;
- 
- -- 使用触发器实现主键自增[行级触发器]
- 
- create or replace trigger autoid
- before
- insert
- on person
- for each row
-   declare
-   begin
-     select s_person.nextval into :new.pid from dual;
-   end;
- 
-insert into person(pname) values('xiao');
-commit;
