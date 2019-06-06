@@ -509,7 +509,6 @@ public class JpqlTest {
         JpaUtils.getEt().commit();
         //释放资源
         em.close();
-
     }
 }
 
