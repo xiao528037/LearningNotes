@@ -105,7 +105,7 @@ System. out. println(stringBuilder. reverse()); // gfedcba
 
 ```txt
 1.indexof():返回指定字符的索引
-2.charAt():返回指定所引出的字符
+2.charAt():返回指定索引的字符
 3.replace()：字符串替换
 4.trim():去除字符串两端空白
 5.spilt():分割字符串，返回一个分割后的字符串数组。
@@ -206,7 +206,7 @@ Files.write():写入文件
     * WeakHashMap
 
   * TreeMap：基于红黑树（red-black tree)数据结构实现，按key排序，默认的排序方式是升序。
-  * ConcurrentHashMap
+  * ConcurrentHashMap：线程安全
   * HashTable：内存存储的键值对是无需的事按照哈希算法进行排序，线程安全的，并且键和值不能为null，否则会抛空指针异常。
 
 ![img](assets\Collection)
@@ -263,7 +263,7 @@ Map是一个独立的接口，没有实现Collection,Map是一种把键对象和
 ## 23.HashMap的实现原理
 
 ```txt
-HashMap基于Hash算法实现的，我们通过put(key,value)存储，get(key)来获取u，当传入key是，HashMap会更具key.hashCode()计算出来hash值，更具hash值将value保存在bucket里面，当计算出的hash值相同时，我们称之为hash冲突，HashMap的做法使用链表和红黑树存储相同hash值的value，当hash冲突的个数比较少是，使用链表否则使用红黑树。
+HashMap基于Hash算法实现的，我们通过put(key,value)存储，get(key)来获取value，当传入key是，HashMap会更具key.hashCode()计算出来hash值，更具hash值将value保存在bucket里面，当计算出的hash值相同时，我们称之为hash冲突，HashMap的做法使用链表和红黑树存储相同hash值的value，当hash冲突的个数比较少是，使用链表否则使用红黑树。
 ```
 
 ## 24.HashSet的实现原理
@@ -330,9 +330,9 @@ Itreator的特点是更加安全，因为他可以确保，在当便利的集合
 ## 33.Iterator和ListIterator有什么区别
 
 ```txt
-1. Iterator可以便利Set和List集合，而ListIterator只能遍历List。
+1. Iterator可以遍历Set和List集合，而ListIterator只能遍历List。
 2. Iterator只能单向遍历，而ListIterator可以双向遍历（向前/向后）
-3. ListIterator从Iterator接口继承，然后添加了一些额外的工鞥呢，比如添加一个元素、替换一个元素、获取前面或后面元素的索引位置。
+3. ListIterator从Iterator接口继承，然后添加了一些额外的功能，比如添加一个元素、替换一个元素、获取前面或后面元素的索引位置。
 ```
 
 ## 34.怎么确保一个集合不能被修改？
@@ -344,7 +344,7 @@ Itreator的特点是更加安全，因为他可以确保，在当便利的集合
 ## 35.并行和并发有什么区别
 
 ```txt
-- 并行：多个处理器和多核处理器同事处理多个任务。
+- 并行：多个处理器和多核处理器同时处理多个任务。
 - 并发：多个任务在同一个cpu核上，按细分的时间片轮流执行，从逻辑上来看那些任务是同时执行。
 ```
 
@@ -355,4 +355,65 @@ Itreator的特点是更加安全，因为他可以确保，在当便利的集合
 ```
 
 
+
+## 37.守护线程
+
+```txt
+守护线程试运行在后台的一种特殊进程。他独立与控制终端并且周期性的执行某种任务或等待处理某些发生的时间。在Java中垃圾回收线程就是特殊的守护线程。
+```
+
+## 38.创建线程有哪几种方式
+
+```txt
+1.继承Thread重写run方法
+2.实现Runnable接口
+3.实现Callable接口
+```
+
+## 39.说一些runnable和callable有什么区别
+
+```txt
+runnable没有返回值，callble可以拿到又返回值，callble可以看作是runnable的补充。
+```
+
+## 40.线程有哪些状态
+
+线程的状态：
+
+- 新建状态（New):新创建一个线程对象
+
+- 就绪状态（Runnable）：线程对象创建后，其他线程调用了该对象的start（）方法。该状态的线程位于“可运行线程池”中，变得可运行，只等待获取CPU的使用权。即在就绪状态的进程除CPU之外，其他的运行所需资料都已全部获得。
+
+- 运行状态（Running）：就绪状态的线程获取CPU，执行程序代码。
+
+- 阻塞状态（Blocked）：阻塞状态是线程因为某种原因放弃CPU使用权，暂时停止运行。直到线程进入就绪状态，才有机会转到运行状态。
+  - 等待阻塞：运行的线程执行wait（）方法，该线程会释放占用的所有资源，JVM会把该线程放入“等待池”中，进入这个状态后，是甭能自动唤醒的，必须依靠其他线程调用notify（）或notifyAll（）方法才能被唤醒。
+  - 同步阻塞：运行的线程在获取对象的同步所示，若该同步锁被别的占城占用，则JVM会该线程放入“锁池”中。
+  - 其他阻塞：运行的线程执行sleep（）或join（）方法，或者发出了I/O请求时，JVM会把该线程置为阻塞状态。当sleep（）状态超时，join（）等待线程终止或者超时，或者I/O处理完毕时，线程重新转入就绪状态。
+
+- 死亡状态（Dead）：线程执行完了或者因异常退出了run（）方法，该线程结束生命周期。
+
+## 41.sleep()和wait()有什么区别？
+
+- 类的不同：sleep（）来自Thread，wait（）来自Object。
+- 释放锁：sleep（）不释放锁；wait（）释放锁。
+- 用法不同：sleep（）时间到会自动恢复；wait（）可以使用notify（）/notifyAll（）直接唤醒。
+
+## 42.notify()和notifyAll()有什么区别
+
+```txt
+notifyAll（）会唤醒所有的线程，notify（）之后唤醒一个线程。notifyAll（）调用后，会将全部线程由等待池一道锁池，然后参与锁的竞争，竞争成功则继续执行，如果不成功则留在锁池等待锁被释放厚再次参与竞争。而notify（）只会释放一个线程，具体唤醒哪一个线程由虚拟机控制。
+```
+
+## 43.线程run()和start()有什么区别
+
+~~~txt
+start()方法用于启动线程，run()方法用于执行线程的运行时代码。run()可以重复调用，而start()只能调用一次。
+~~~
+
+## 44.创建线程池有哪几种方式？
+
+- newSingleThreadExecutor():他的特点在于工作线程数目被限制为1，操作一个误解的工作队列，所以它保证了所有任务的都是被顺序执行，最多会有一个任务处于活动状态，并且不允许使用者改动线程池实例，因此可以避免其改变线程数目；
+- newCachedThreadPool():它是一种用来处理大量短时间工作任务的线程池，具有几个鲜明特点：他会试图缓存线程并重用，当无缓存线程可用时，就会创建新的工作线程，如果线程限制的时间超过60秒，则被种植并移出缓存；长时间闲置时，这种线程池，不会消耗什么资源。其内部使用SynchronousQueu作为工作队列。
+- 
 
